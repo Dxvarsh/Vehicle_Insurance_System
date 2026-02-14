@@ -91,3 +91,20 @@ export const MESSAGES = {
     MIN_NAME: 'Name must be at least 2 characters',
     INVALID_VEHICLE: 'Enter valid format (e.g., KA01AB1234)',
 };
+
+// Vehicle Type Options
+export const VEHICLE_TYPE_OPTIONS = [
+  { value: '2-Wheeler', label: '2-Wheeler (Bike/Scooter)' },
+  { value: '4-Wheeler', label: '4-Wheeler (Car/SUV)' },
+  { value: 'Commercial', label: 'Commercial Vehicle' },
+];
+
+// Registration Year Options (1990 to current year)
+export const getRegistrationYearOptions = () => {
+  const currentYear = new Date().getFullYear();
+  const years = [];
+  for (let year = currentYear; year >= 1990; year--) {
+    years.push({ value: year, label: year.toString() });
+  }
+  return years;
+};
