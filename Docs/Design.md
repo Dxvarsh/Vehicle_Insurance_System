@@ -277,7 +277,7 @@ colors: {
 
 ```jsx
 /* Two-column layout (Desktop: 8-4, Tablet: Full width) */
-<div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
   <div className="lg:col-span-8">
     {/* Main content */}
   </div>
@@ -287,7 +287,7 @@ colors: {
 </div>
 
 /* Three-column card grid */
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
   <Card />
   <Card />
   <Card />
@@ -757,7 +757,7 @@ colors: {
 - Subtle background color
 
 ```jsx
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
   {/* Total Policies */}
   <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
     <div className="flex items-center justify-between">
@@ -1023,13 +1023,13 @@ Desktop:                      Mobile:
     {/* Active Policies */}
     <div className="mb-8">
       <h2 className="text-2xl font-semibold text-primary mb-4">Your Active Policies</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Policy Cards */}
       </div>
     </div>
     
     {/* Notifications & Renewals */}
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h3 className="text-lg font-semibold text-primary mb-4">Recent Notifications</h3>
         {/* Notification list */}
@@ -1313,7 +1313,7 @@ xl: '1280px',  /* Desktops */
 <div className="flex flex-col md:flex-row gap-4">
 
 /* Desktop: 3 columns */
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 ```
 
 ### Responsive Typography

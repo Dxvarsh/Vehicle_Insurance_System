@@ -5,47 +5,30 @@ import { ROLES } from '../utils/constants';
 import ProtectedRoute from './ProtectedRoute';
 import PublicRoute from './PublicRoute';
 
+// Layout
+import DashboardLayout from '../components/layout/DashboardLayout';
+
 // Auth Pages
 import LoginPage from '../pages/auth/LoginPage';
 import RegisterPage from '../pages/auth/RegisterPage';
 import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from '../pages/auth/ResetPasswordPage';
-
-// Placeholder pages (will be built in future iterations)
 import UnauthorizedPage from '../pages/auth/UnauthorizedPage';
 
-// Temporary Dashboard placeholders
-const CustomerDashboard = () => (
-    <div className="min-h-screen bg-bg-primary flex items-center justify-center">
-        <div className="text-center">
-            <h1 className="text-3xl font-bold text-primary-500">Customer Dashboard</h1>
-            <p className="text-text-secondary mt-2">Coming soon in next iteration...</p>
-        </div>
-    </div>
-);
+// Dashboard Placeholders (will be replaced in next iterations)
+import CustomerDashboardPage from '../pages/customer/CustomerDashboardPage';
+import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
+import StaffDashboardPage from '../pages/staff/StaffDashboardPage';
 
-const AdminDashboard = () => (
-    <div className="min-h-screen bg-bg-primary flex items-center justify-center">
-        <div className="text-center">
-            <h1 className="text-3xl font-bold text-primary-500">Admin Dashboard</h1>
-            <p className="text-text-secondary mt-2">Coming soon in next iteration...</p>
-        </div>
-    </div>
-);
-
-const StaffDashboard = () => (
-    <div className="min-h-screen bg-bg-primary flex items-center justify-center">
-        <div className="text-center">
-            <h1 className="text-3xl font-bold text-primary-500">Staff Dashboard</h1>
-            <p className="text-text-secondary mt-2">Coming soon in next iteration...</p>
-        </div>
-    </div>
-);
+// Profile
+import ProfilePage from '../pages/customer/ProfilePage';
 
 const AppRoutes = () => {
     return (
         <Routes>
-            {/* ═══ Public Routes ═══ */}
+            {/* ═══════════════════════════════════════════ */}
+            {/*              PUBLIC ROUTES                  */}
+            {/* ═══════════════════════════════════════════ */}
             <Route
                 path="/login"
                 element={
@@ -79,40 +62,66 @@ const AppRoutes = () => {
                 }
             />
 
-            {/* ═══ Customer Routes ═══ */}
+            {/* ═══════════════════════════════════════════ */}
+            {/*           CUSTOMER ROUTES                   */}
+            {/* ═══════════════════════════════════════════ */}
             <Route
                 path="/dashboard"
                 element={
                     <ProtectedRoute allowedRoles={[ROLES.CUSTOMER]}>
-                        <CustomerDashboard />
+                        <DashboardLayout>
+                            <CustomerDashboardPage />
+                        </DashboardLayout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/profile"
+                element={
+                    <ProtectedRoute allowedRoles={[ROLES.CUSTOMER, ROLES.ADMIN, ROLES.STAFF]}>
+                        <DashboardLayout>
+                            <ProfilePage />
+                        </DashboardLayout>
                     </ProtectedRoute>
                 }
             />
 
-            {/* ═══ Admin Routes ═══ */}
+            {/* ═══════════════════════════════════════════ */}
+            {/*             ADMIN ROUTES                    */}
+            {/* ═══════════════════════════════════════════ */}
             <Route
                 path="/admin/dashboard"
                 element={
                     <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
-                        <AdminDashboard />
+                        <DashboardLayout>
+                            <AdminDashboardPage />
+                        </DashboardLayout>
                     </ProtectedRoute>
                 }
             />
 
-            {/* ═══ Staff Routes ═══ */}
+            {/* ═══════════════════════════════════════════ */}
+            {/*             STAFF ROUTES                    */}
+            {/* ═══════════════════════════════════════════ */}
             <Route
                 path="/staff/dashboard"
                 element={
                     <ProtectedRoute allowedRoles={[ROLES.STAFF]}>
-                        <StaffDashboard />
+                        <DashboardLayout>
+                            <StaffDashboardPage />
+                        </DashboardLayout>
                     </ProtectedRoute>
                 }
             />
 
-            {/* ═══ Error Routes ═══ */}
+            {/* ═══════════════════════════════════════════ */}
+            {/*             ERROR ROUTES                    */}
+            {/* ═══════════════════════════════════════════ */}
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-            {/* ═══ Default Redirect ═══ */}
+            {/* ═══════════════════════════════════════════ */}
+            {/*           DEFAULT REDIRECT                  */}
+            {/* ═══════════════════════════════════════════ */}
             <Route path="/" element={<Navigate to="/login" replace />} />
             <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
