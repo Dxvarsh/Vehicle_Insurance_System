@@ -16,6 +16,8 @@ import errorHandler from './middleware/errorHandler.js';
 import authRoutes from './routes/authRoutes.js';
 import customerRoutes from './routes/customerRoutes.js';
 import vehicleRoutes from './routes/vehicleRoutes.js';
+import policyRoutes from './routes/policyRoutes.js';
+
 
 // Future route imports will go here
 
@@ -75,9 +77,9 @@ if (config.nodeEnv === 'development') {
 app.use('/api/auth', authRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/vehicles', vehicleRoutes);
+app.use('/api/policies', policyRoutes);
 
 // Future routes:
-// app.use('/api/policies', policyRoutes);
 // app.use('/api/premiums', premiumRoutes);
 // app.use('/api/renewals', renewalRoutes);
 // app.use('/api/claims', claimRoutes);
