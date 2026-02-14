@@ -94,9 +94,9 @@ app.get('/api/health', (req, res) => {
 });
 
 // ─────────────────────────────────────────────
-// 404 Handler
+// 404 Handler (Express v5 compatible)
 // ─────────────────────────────────────────────
-app.use('*', (req, res) => {
+app.use((req, res) => {
     res.status(404).json({
         success: false,
         message: `Route ${req.originalUrl} not found`,
