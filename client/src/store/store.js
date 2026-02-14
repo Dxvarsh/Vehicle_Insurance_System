@@ -1,13 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
 import customerReducer from './slices/customerSlice';
+import vehicleReducer from './slices/vehicleSlice';
 
 const store = configureStore({
     reducer: {
         auth: authReducer,
         customer: customerReducer,
+        vehicle: vehicleReducer,
         // Future slices:
-        // vehicle: vehicleReducer,
         // policy: policyReducer,
         // premium: premiumReducer,
         // renewal: renewalReducer,
