@@ -15,13 +15,18 @@ import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from '../pages/auth/ResetPasswordPage';
 import UnauthorizedPage from '../pages/auth/UnauthorizedPage';
 
-// Dashboard Placeholders (will be replaced in next iterations)
+// Customer Pages
 import CustomerDashboardPage from '../pages/customer/CustomerDashboardPage';
-import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
-import StaffDashboardPage from '../pages/staff/StaffDashboardPage';
-
-// Profile
 import ProfilePage from '../pages/customer/ProfilePage';
+
+// Admin Pages
+import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
+import CustomerListPage from '../pages/admin/CustomerListPage';
+import CustomerDetailPage from '../pages/admin/CustomerDetailPage';
+import RegisterCustomerPage from '../pages/admin/RegisterCustomerPage';
+
+// Staff Pages
+import StaffDashboardPage from '../pages/staff/StaffDashboardPage';
 
 const AppRoutes = () => {
     return (
@@ -99,6 +104,36 @@ const AppRoutes = () => {
                     </ProtectedRoute>
                 }
             />
+            <Route
+                path="/admin/customers"
+                element={
+                    <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
+                        <DashboardLayout>
+                            <CustomerListPage />
+                        </DashboardLayout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/admin/customers/new"
+                element={
+                    <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
+                        <DashboardLayout>
+                            <RegisterCustomerPage />
+                        </DashboardLayout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/admin/customers/:id"
+                element={
+                    <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
+                        <DashboardLayout>
+                            <CustomerDetailPage />
+                        </DashboardLayout>
+                    </ProtectedRoute>
+                }
+            />
 
             {/* ═══════════════════════════════════════════ */}
             {/*             STAFF ROUTES                    */}
@@ -109,6 +144,36 @@ const AppRoutes = () => {
                     <ProtectedRoute allowedRoles={[ROLES.STAFF]}>
                         <DashboardLayout>
                             <StaffDashboardPage />
+                        </DashboardLayout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/staff/customers"
+                element={
+                    <ProtectedRoute allowedRoles={[ROLES.STAFF]}>
+                        <DashboardLayout>
+                            <CustomerListPage />
+                        </DashboardLayout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/staff/customers/new"
+                element={
+                    <ProtectedRoute allowedRoles={[ROLES.STAFF]}>
+                        <DashboardLayout>
+                            <RegisterCustomerPage />
+                        </DashboardLayout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/staff/customers/:id"
+                element={
+                    <ProtectedRoute allowedRoles={[ROLES.STAFF]}>
+                        <DashboardLayout>
+                            <CustomerDetailPage />
                         </DashboardLayout>
                     </ProtectedRoute>
                 }

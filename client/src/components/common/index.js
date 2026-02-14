@@ -7,4 +7,5 @@ export { default as Modal } from './Modal';
 export { default as PageHeader } from './PageHeader';
 export { default as EmptyState } from './EmptyState';
 export { default as StatsCard } from './StatsCard';
+export { default as DataTable } from './DataTable';
 export { PageLoader, Spinner, Skeleton, CardSkeleton } from './Loader';
