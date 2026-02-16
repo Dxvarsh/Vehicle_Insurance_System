@@ -158,13 +158,9 @@ export const getAllPolicies = async (req, res, next) => {
     const formattedPolicies = policies.map((policy) => ({
       ...policy,
       premiumRules: {
-        vehicleTypeMultiplier: policy.premiumRules?.vehicleTypeMultiplier
-          ? Object.fromEntries(policy.premiumRules.vehicleTypeMultiplier)
-          : { '2-Wheeler': 0.8, '4-Wheeler': 1.0, 'Commercial': 1.5 },
+        vehicleTypeMultiplier: policy.premiumRules?.vehicleTypeMultiplier || { '2-Wheeler': 0.8, '4-Wheeler': 1.0, 'Commercial': 1.5 },
         ageDepreciation: policy.premiumRules?.ageDepreciation ?? 2,
-        coverageMultiplier: policy.premiumRules?.coverageMultiplier
-          ? Object.fromEntries(policy.premiumRules.coverageMultiplier)
-          : { 'Third-Party': 0.6, 'Comprehensive': 1.0, 'Own-Damage': 0.8 },
+        coverageMultiplier: policy.premiumRules?.coverageMultiplier || { 'Third-Party': 0.6, 'Comprehensive': 1.0, 'Own-Damage': 0.8 },
       },
     }));
 
@@ -200,13 +196,9 @@ export const getPolicyById = async (req, res, next) => {
     const formattedPolicy = {
       ...policy,
       premiumRules: {
-        vehicleTypeMultiplier: policy.premiumRules?.vehicleTypeMultiplier
-          ? Object.fromEntries(policy.premiumRules.vehicleTypeMultiplier)
-          : { '2-Wheeler': 0.8, '4-Wheeler': 1.0, 'Commercial': 1.5 },
+        vehicleTypeMultiplier: policy.premiumRules?.vehicleTypeMultiplier || { '2-Wheeler': 0.8, '4-Wheeler': 1.0, 'Commercial': 1.5 },
         ageDepreciation: policy.premiumRules?.ageDepreciation ?? 2,
-        coverageMultiplier: policy.premiumRules?.coverageMultiplier
-          ? Object.fromEntries(policy.premiumRules.coverageMultiplier)
-          : { 'Third-Party': 0.6, 'Comprehensive': 1.0, 'Own-Damage': 0.8 },
+        coverageMultiplier: policy.premiumRules?.coverageMultiplier || { 'Third-Party': 0.6, 'Comprehensive': 1.0, 'Own-Damage': 0.8 },
       },
     };
 

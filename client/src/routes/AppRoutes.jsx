@@ -35,6 +35,14 @@ import AdminVehicleListPage from '../pages/admin/AdminVehicleListPage';
 // Staff Pages
 import StaffDashboardPage from '../pages/staff/StaffDashboardPage';
 
+// Policy Pages
+import PolicyListPage from '../pages/policy/PolicyListPage';
+import PolicyDetailPage from '../pages/policy/PolicyDetailPage';
+import PurchasePolicyPage from '../pages/policy/PurchasePolicyPage';
+import AdminPolicyListPage from '../pages/admin/AdminPolicyListPage';
+import ManagePolicyPage from '../pages/admin/ManagePolicyPage';
+import PaymentPage from '../pages/premium/PaymentPage';
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -82,6 +90,29 @@ const AppRoutes = () => {
         </ProtectedRoute>
       } />
 
+      {/* Policy Routes */}
+      <Route path="/policies" element={
+        <ProtectedRoute allowedRoles={[ROLES.CUSTOMER, ROLES.ADMIN, ROLES.STAFF]}>
+          <DashboardLayout><PolicyListPage /></DashboardLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/policies/:id" element={
+        <ProtectedRoute allowedRoles={[ROLES.CUSTOMER, ROLES.ADMIN, ROLES.STAFF]}>
+          <DashboardLayout><PolicyDetailPage /></DashboardLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/policies/:id/purchase" element={
+        <ProtectedRoute allowedRoles={[ROLES.CUSTOMER]}>
+          <DashboardLayout><PurchasePolicyPage /></DashboardLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/premium/pay/:id" element={
+        <ProtectedRoute allowedRoles={[ROLES.CUSTOMER]}>
+          <DashboardLayout><PaymentPage /></DashboardLayout>
+        </ProtectedRoute>
+      } />
+
+
       {/* ═══════════════════════════════════════════ */}
       {/*             ADMIN ROUTES                    */}
       {/* ═══════════════════════════════════════════ */}
@@ -120,6 +151,21 @@ const AppRoutes = () => {
       <Route path="/admin/vehicles/:id" element={
         <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
           <DashboardLayout><VehicleDetailPage /></DashboardLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/policies" element={
+        <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
+          <DashboardLayout><AdminPolicyListPage /></DashboardLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/policies/new" element={
+        <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
+          <DashboardLayout><ManagePolicyPage /></DashboardLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/policies/:id/edit" element={
+        <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
+          <DashboardLayout><ManagePolicyPage /></DashboardLayout>
         </ProtectedRoute>
       } />
       <Route path="/admin/vehicles/:id/edit" element={

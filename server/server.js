@@ -17,9 +17,9 @@ import authRoutes from './routes/authRoutes.js';
 import customerRoutes from './routes/customerRoutes.js';
 import vehicleRoutes from './routes/vehicleRoutes.js';
 import policyRoutes from './routes/policyRoutes.js';
-
-
-// Future route imports will go here
+import premiumRoutes from './routes/premiumRoutes.js';
+import renewalRoutes from './routes/renewalRoutes.js';
+import claimRoutes from './routes/claimRoutes.js';
 
 const app = express();
 
@@ -78,18 +78,11 @@ app.use('/api/auth', authRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/vehicles', vehicleRoutes);
 app.use('/api/policies', policyRoutes);
+app.use('/api/premiums', premiumRoutes);
+app.use('/api/renewals', renewalRoutes);
+app.use('/api/claims', claimRoutes);
 
-// Future routes:
-// app.use('/api/premiums', premiumRoutes);
-// app.use('/api/renewals', renewalRoutes);
-// app.use('/api/claims', claimRoutes);
-// app.use('/api/notifications', notificationRoutes);
-// app.use('/api/dashboard', dashboardRoutes);
-// app.use('/api/reports', reportRoutes);
-
-// ─────────────────────────────────────────────
 // Health Check
-// ─────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
     res.status(200).json({
         success: true,
@@ -99,9 +92,7 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// ─────────────────────────────────────────────
-// 404 Handler (Express v5 compatible)
-// ─────────────────────────────────────────────
+// 404 Handler
 app.use((req, res) => {
     res.status(404).json({
         success: false,
@@ -109,17 +100,12 @@ app.use((req, res) => {
     });
 });
 
-// ─────────────────────────────────────────────
 // Global Error Handler
-// ─────────────────────────────────────────────
 app.use(errorHandler);
 
-// ─────────────────────────────────────────────
 // Start Server
-// ─────────────────────────────────────────────
 const startServer = async () => {
     try {
-        // Connect to MongoDB
         await connectDB();
 
         app.listen(config.port, () => {
