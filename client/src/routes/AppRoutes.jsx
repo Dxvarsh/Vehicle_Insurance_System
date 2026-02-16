@@ -42,6 +42,9 @@ import PurchasePolicyPage from '../pages/policy/PurchasePolicyPage';
 import AdminPolicyListPage from '../pages/admin/AdminPolicyListPage';
 import ManagePolicyPage from '../pages/admin/ManagePolicyPage';
 import PaymentPage from '../pages/premium/PaymentPage';
+import MyPremiumsPage from '../pages/premium/MyPremiumsPage';
+import AdminPremiumListPage from '../pages/admin/AdminPremiumListPage';
+import PremiumReceiptPage from '../pages/premium/PremiumReceiptPage';
 
 const AppRoutes = () => {
   return (
@@ -111,6 +114,16 @@ const AppRoutes = () => {
           <DashboardLayout><PaymentPage /></DashboardLayout>
         </ProtectedRoute>
       } />
+      <Route path="/premiums" element={
+        <ProtectedRoute allowedRoles={[ROLES.CUSTOMER]}>
+          <DashboardLayout><MyPremiumsPage /></DashboardLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/premium/receipt/:id" element={
+        <ProtectedRoute allowedRoles={[ROLES.CUSTOMER, ROLES.ADMIN, ROLES.STAFF]}>
+          <DashboardLayout><PremiumReceiptPage /></DashboardLayout>
+        </ProtectedRoute>
+      } />
 
 
       {/* ═══════════════════════════════════════════ */}
@@ -168,6 +181,11 @@ const AppRoutes = () => {
           <DashboardLayout><ManagePolicyPage /></DashboardLayout>
         </ProtectedRoute>
       } />
+      <Route path="/admin/premiums" element={
+        <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
+          <DashboardLayout><AdminPremiumListPage /></DashboardLayout>
+        </ProtectedRoute>
+      } />
       <Route path="/admin/vehicles/:id/edit" element={
         <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
           <DashboardLayout><EditVehiclePage /></DashboardLayout>
@@ -212,6 +230,11 @@ const AppRoutes = () => {
       <Route path="/staff/vehicles/:id" element={
         <ProtectedRoute allowedRoles={[ROLES.STAFF]}>
           <DashboardLayout><VehicleDetailPage /></DashboardLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/staff/premiums" element={
+        <ProtectedRoute allowedRoles={[ROLES.STAFF]}>
+          <DashboardLayout><AdminPremiumListPage /></DashboardLayout>
         </ProtectedRoute>
       } />
       <Route path="/staff/vehicles/:id/edit" element={

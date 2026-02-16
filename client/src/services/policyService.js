@@ -35,6 +35,11 @@ const policyService = {
     return response.data;
   },
 
+  getPaymentReceipt: async (id) => {
+    const response = await api.get(`/premiums/${id}/receipt`);
+    return response.data;
+  },
+
   // Renewals
   getMyRenewals: async (params) => {
     const response = await api.get('/renewals/my', { params });
@@ -90,6 +95,11 @@ const policyService = {
 
   adminUpdateClaimStatus: async (id, action, data) => {
     const response = await api.put(`/claims/${id}/${action}`, data);
+    return response.data;
+  },
+
+  adminGetAllPremiums: async (params) => {
+    const response = await api.get('/premiums', { params });
     return response.data;
   }
 };

@@ -3,6 +3,7 @@ import policyService from '../../services/policyService';
 
 const initialState = {
   policies: [],
+  adminPremiums: [],
   myPremiums: [],
   myClaims: [],
   myRenewals: [],
@@ -23,6 +24,17 @@ export const fetchPolicies = createAsyncThunk(
       return await policyService.getAllPolicies(params);
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch policies');
+    }
+  }
+);
+
+export const fetchAdminPremiums = createAsyncThunk(
+  'policy/fetchAdminPremiums',
+  async (params, { rejectWithValue }) => {
+    try {
+      return await policyService.adminGetAllPremiums(params);
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch premiums');
     }
   }
 );
@@ -129,6 +141,19 @@ const policySlice = createSlice({
         state.pagination = action.payload.pagination;
       })
       .addCase(fetchPolicies.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      // Admin Premiums
+      .addCase(fetchAdminPremiums.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchAdminPremiums.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.adminPremiums = action.payload.data;
+        state.pagination = action.payload.pagination;
+      })
+      .addCase(fetchAdminPremiums.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })

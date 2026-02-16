@@ -11,6 +11,7 @@ import {
   AlertCircle,
   CreditCard,
   History,
+  Zap,
 } from 'lucide-react';
 import {
   fetchPolicyById,
@@ -59,9 +60,9 @@ const PurchasePolicyPage = () => {
     }
 
     try {
-      await dispatch(calculatePremiumPreview({ 
-        policyID: id, 
-        vehicleID: selectedVehicle._id 
+      await dispatch(calculatePremiumPreview({
+        policyID: id,
+        vehicleID: selectedVehicle._id
       })).unwrap();
       setStep(2);
     } catch (err) {
@@ -71,11 +72,11 @@ const PurchasePolicyPage = () => {
 
   const handlePurchase = async () => {
     try {
-      const result = await dispatch(purchasePolicy({ 
-        id, 
-        vehicleID: selectedVehicle._id 
+      const result = await dispatch(purchasePolicy({
+        id,
+        vehicleID: selectedVehicle._id
       })).unwrap();
-      
+
       toast.success('Policy application submitted successfully!');
       setShowConfirmModal(false);
       // Navigate to payment page (premium/pay/:id)
@@ -135,8 +136,8 @@ const PurchasePolicyPage = () => {
                         onClick={() => setSelectedVehicle(vehicle)}
                         className={cn(
                           "flex items-center justify-between p-6 rounded-2xl border-2 text-left transition-all duration-200",
-                          selectedVehicle?._id === vehicle._id 
-                            ? "border-primary-500 bg-primary-50/30 shadow-md ring-4 ring-primary-50" 
+                          selectedVehicle?._id === vehicle._id
+                            ? "border-primary-500 bg-primary-50/30 shadow-md ring-4 ring-primary-50"
                             : "border-border-light hover:border-primary-200 bg-white"
                         )}
                       >
@@ -179,8 +180,8 @@ const PurchasePolicyPage = () => {
                       We'll calculate your custom premium based on {selectedVehicle.vehicleNumber}'s details.
                     </p>
                   </div>
-                  <Button 
-                    variant="primary" 
+                  <Button
+                    variant="primary"
                     className="w-full h-14 bg-white text-primary-900 hover:bg-primary-50 rounded-2xl font-bold text-lg"
                     onClick={handleCalculate}
                   >
@@ -218,7 +219,7 @@ const PurchasePolicyPage = () => {
                       <span className="">Vehicle Age Depreciation ({new Date().getFullYear() - selectedVehicle.registrationYear} Yrs)</span>
                       <span className="font-mono font-semibold">- {premiumPreview.premiumBreakdown.ageDepreciation}%</span>
                     </div>
-                    
+
                     <div className="pt-6 border-t border-border-light mt-6">
                       <div className="flex justify-between items-center">
                         <div className="space-y-1">
@@ -245,16 +246,16 @@ const PurchasePolicyPage = () => {
               </div>
 
               <div className="flex gap-4">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-1/3 h-14 rounded-2xl"
                   onClick={() => setStep(1)}
                   leftIcon={<ArrowLeft className="w-5 h-5" />}
                 >
                   Change Vehicle
                 </Button>
-                <Button 
-                  variant="primary" 
+                <Button
+                  variant="primary"
                   className="flex-1 h-14 rounded-2xl shadow-xl shadow-primary-200"
                   onClick={() => setShowConfirmModal(true)}
                   rightIcon={<CreditCard className="w-5 h-5" />}

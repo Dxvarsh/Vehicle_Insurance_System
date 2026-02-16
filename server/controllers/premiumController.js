@@ -95,3 +95,35 @@ export const processPayment = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * @desc    Get detailed premium receipt
+ * @access  Customer, Admin, Staff
+ * @req     PREM-06
+ */
+export const getPaymentReceipt = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const premium = await Premium.findById(id)
+      .populate('customerID', 'name email address contactNumber customerID')
+      .populate('policyID', 'policyName policyID coverageType policyDuration baseAmount description')
+      .populate('vehicleID', 'vehicleNumber model vehicleType registrationYear vehicleID')
+      .lean();
+
+    if (!premium) return errorResponse(res, 404, 'Premium record not found');
+
+    // Access control: Admin/Staff can view all, Customer only their own
+    if (req.user.role === 'Customer' && premium.customerID._id.toString() !== req.user.linkedCustomerID?.toString()) {
+       return errorResponse(res, 403, 'Unauthorized access to this receipt');
+    }
+
+    if (premium.paymentStatus !== 'Paid') {
+       return errorResponse(res, 400, 'Receipt is only available for paid premiums');
+    }
+
+    return successResponse(res, 200, 'Receipt fetched successfully', { premium });
+  } catch (error) {
+    next(error);
+  }
+};
