@@ -21,7 +21,7 @@ import {
     Trash2,
     CheckCircle,
     XCircle,
-    MegaPhone,
+    Megaphone,
     User
 } from 'lucide-react';
 import api from '../../services/api'; // For searching customers

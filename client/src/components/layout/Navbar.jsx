@@ -103,20 +103,22 @@ const Navbar = ({ onMenuToggle }) => {
                         <HelpCircle className="w-5 h-5" />
                     </button>
 
-                    {/* Notifications */}
-                    <Link
-                        to={user?.role === 'Admin' ? '/admin/notifications' : '/notifications'}
-                        className="relative p-2 rounded-lg hover:bg-bg-secondary text-text-secondary transition-colors"
-                        aria-label="Notifications"
-                    >
-                        <Bell className="w-5 h-5" />
-                        {/* Unread Badge */}
-                        {unreadCount > 0 && (
-                            <span className="absolute top-1 right-1 w-4 h-4 bg-danger text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-in zoom-in duration-300">
-                                {unreadCount > 9 ? '9+' : unreadCount}
-                            </span>
-                        )}
-                    </Link>
+                    {/* Notifications (Customer Only) */}
+                    {user?.role === 'Customer' && (
+                        <Link
+                            to="/notifications"
+                            className="relative p-2 rounded-lg hover:bg-bg-secondary text-text-secondary transition-colors"
+                            aria-label="Notifications"
+                        >
+                            <Bell className="w-5 h-5" />
+                            {/* Unread Badge */}
+                            {unreadCount > 0 && (
+                                <span className="absolute top-1 right-1 w-4 h-4 bg-danger text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-in zoom-in duration-300">
+                                    {unreadCount > 9 ? '9+' : unreadCount}
+                                </span>
+                            )}
+                        </Link>
+                    )}
 
                     {/* Divider */}
                     <div className="hidden sm:block w-px h-8 bg-border-light mx-1" />

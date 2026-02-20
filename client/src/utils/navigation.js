@@ -130,11 +130,6 @@ export const adminNavItems = [
                 path: '/admin/claims',
                 icon: AlertTriangle,
             },
-            {
-                label: 'Notifications',
-                path: '/admin/notifications',
-                icon: Bell,
-            },
         ],
     },
     {

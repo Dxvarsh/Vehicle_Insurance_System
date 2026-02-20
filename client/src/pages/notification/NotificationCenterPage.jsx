@@ -77,7 +77,7 @@ const NotificationCenterPage = () => {
     }
 
     return (
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div>
             <PageHeader
                 title="Notification Center"
                 subtitle={`You have ${unreadCount} unread messages`}
