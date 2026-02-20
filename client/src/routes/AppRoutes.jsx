@@ -51,6 +51,15 @@ import RenewalListPage from '../pages/renewal/RenewalListPage';
 import RenewalRequestPage from '../pages/renewal/RenewalRequestPage';
 import AdminRenewalListPage from '../pages/admin/AdminRenewalListPage';
 
+// Claim Pages
+import ClaimListPage from '../pages/claim/ClaimListPage';
+import ClaimRequestPage from '../pages/claim/ClaimRequestPage';
+import AdminClaimListPage from '../pages/admin/AdminClaimListPage';
+
+// Notification Pages
+import NotificationCenterPage from '../pages/notification/NotificationCenterPage';
+import BroadcastPage from '../pages/admin/BroadcastPage';
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -142,6 +151,23 @@ const AppRoutes = () => {
         </ProtectedRoute>
       } />
 
+      {/* Claim Routes */}
+      <Route path="/claims" element={
+        <ProtectedRoute allowedRoles={[ROLES.CUSTOMER]}>
+          <DashboardLayout><ClaimListPage /></DashboardLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/claims/new" element={
+        <ProtectedRoute allowedRoles={[ROLES.CUSTOMER]}>
+          <DashboardLayout><ClaimRequestPage /></DashboardLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/notifications" element={
+        <ProtectedRoute allowedRoles={[ROLES.CUSTOMER]}>
+          <DashboardLayout><NotificationCenterPage /></DashboardLayout>
+        </ProtectedRoute>
+      } />
+
 
       {/* ═══════════════════════════════════════════ */}
       {/*             ADMIN ROUTES                    */}
@@ -206,6 +232,16 @@ const AppRoutes = () => {
       <Route path="/admin/renewals" element={
         <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
           <DashboardLayout><AdminRenewalListPage /></DashboardLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/claims" element={
+        <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.STAFF]}>
+          <DashboardLayout><AdminClaimListPage /></DashboardLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/notifications" element={
+        <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
+          <DashboardLayout><BroadcastPage /></DashboardLayout>
         </ProtectedRoute>
       } />
       <Route path="/admin/vehicles/:id/edit" element={

@@ -74,10 +74,75 @@ export const sendRenewalReminder = createAsyncThunk(
   }
 );
 
+// ── Claim Thunks ──
+export const submitClaim = createAsyncThunk(
+  'insurance/submitClaim',
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await insuranceService.submitClaim(data);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to submit claim');
+    }
+  }
+);
+
+export const fetchAllClaims = createAsyncThunk(
+  'insurance/fetchAllClaims',
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await insuranceService.getAllClaims(params);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch claims');
+    }
+  }
+);
+
+export const fetchMyClaims = createAsyncThunk(
+  'insurance/fetchMyClaims',
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await insuranceService.getMyClaims(params);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch your claims');
+    }
+  }
+);
+
+export const processClaim = createAsyncThunk(
+  'insurance/processClaim',
+  async ({ id, ...data }, { rejectWithValue }) => {
+    try {
+      const response = await insuranceService.processClaim(id, data);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to process claim');
+    }
+  }
+);
+
+export const fetchClaimStats = createAsyncThunk(
+  'insurance/fetchClaimStats',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await insuranceService.getClaimStats();
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch claim statistics');
+    }
+  }
+);
+
 const initialState = {
   renewals: [],
   myRenewals: [],
   renewalDetail: null,
+  claims: [],
+  myClaims: [],
+  claimDetail: null,
+  claimStats: null,
   loading: false,
   btnLoading: false,
   error: null,
@@ -146,12 +211,52 @@ const insuranceSlice = createSlice({
         state.error = action.payload;
       })
 
-      // Approve/Reject/Remind
+      // Fetch All Claims (Admin)
+      .addCase(fetchAllClaims.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllClaims.fulfilled, (state, action) => {
+        state.loading = false;
+        state.claims = action.payload.data;
+        state.pagination = action.payload.pagination;
+      })
+      .addCase(fetchAllClaims.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Fetch My Claims (Customer)
+      .addCase(fetchMyClaims.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchMyClaims.fulfilled, (state, action) => {
+        state.loading = false;
+        state.myClaims = action.payload.data;
+        state.pagination = action.payload.pagination;
+      })
+      .addCase(fetchMyClaims.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Fetch Claim Stats
+      .addCase(fetchClaimStats.fulfilled, (state, action) => {
+        state.claimStats = action.payload.data.stats;
+      })
+
+      // Combined Loading for buttons (Submit Renewal/Claim, Process Renewal/Claim, Remind)
       .addMatcher(
         (action) =>
-          [approveRenewal.pending, rejectRenewal.pending, sendRenewalReminder.pending].includes(
-            action.type
-          ),
+          [
+            submitRenewal.pending,
+            submitClaim.pending,
+            approveRenewal.pending,
+            rejectRenewal.pending,
+            processClaim.pending,
+            sendRenewalReminder.pending,
+          ].includes(action.type),
         (state) => {
           state.btnLoading = true;
           state.error = null;
@@ -159,20 +264,29 @@ const insuranceSlice = createSlice({
       )
       .addMatcher(
         (action) =>
-          [approveRenewal.fulfilled, rejectRenewal.fulfilled, sendRenewalReminder.fulfilled].includes(
-            action.type
-          ),
+          [
+            submitRenewal.fulfilled,
+            submitClaim.fulfilled,
+            approveRenewal.fulfilled,
+            rejectRenewal.fulfilled,
+            processClaim.fulfilled,
+            sendRenewalReminder.fulfilled,
+          ].includes(action.type),
         (state, action) => {
           state.btnLoading = false;
           state.success = action.payload.message;
-          // Refresh list if needed or update item in state
         }
       )
       .addMatcher(
         (action) =>
-          [approveRenewal.rejected, rejectRenewal.rejected, sendRenewalReminder.rejected].includes(
-            action.type
-          ),
+          [
+            submitRenewal.rejected,
+            submitClaim.rejected,
+            approveRenewal.rejected,
+            rejectRenewal.rejected,
+            processClaim.rejected,
+            sendRenewalReminder.rejected,
+          ].includes(action.type),
         (state, action) => {
           state.btnLoading = false;
           state.error = action.payload;

@@ -10,17 +10,26 @@ import {
     LogOut,
     HelpCircle,
 } from 'lucide-react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { selectAuth } from '../../store/slices/authSlice';
+import { fetchUnreadCount } from '../../store/slices/notificationSlice';
 import useAuth from '../../hooks/useAuth';
 import { cn, getInitials, getDashboardRoute } from '../../utils/helpers';
 
 const Navbar = ({ onMenuToggle }) => {
+    const dispatch = useDispatch();
     const { user, customer } = useSelector(selectAuth);
+    const { unreadCount } = useSelector((state) => state.notification);
     const { logout } = useAuth();
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const profileRef = useRef(null);
+
+    useEffect(() => {
+        if (user) {
+            dispatch(fetchUnreadCount());
+        }
+    }, [dispatch, user]);
 
     const displayName = customer?.name || user?.username || 'User';
     const displayEmail = user?.email || '';
@@ -102,9 +111,11 @@ const Navbar = ({ onMenuToggle }) => {
                     >
                         <Bell className="w-5 h-5" />
                         {/* Unread Badge */}
-                        <span className="absolute top-1 right-1 w-4 h-4 bg-danger text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                            3
-                        </span>
+                        {unreadCount > 0 && (
+                            <span className="absolute top-1 right-1 w-4 h-4 bg-danger text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-in zoom-in duration-300">
+                                {unreadCount > 9 ? '9+' : unreadCount}
+                            </span>
+                        )}
                     </Link>
 
                     {/* Divider */}

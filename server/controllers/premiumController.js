@@ -2,6 +2,7 @@ import Premium from '../models/Premium.js';
 import InsurancePolicy from '../models/InsurancePolicy.js';
 import Vehicle from '../models/Vehicle.js';
 import PolicyRenewal from '../models/PolicyRenewal.js';
+import Notification from '../models/Notification.js';
 import { successResponse, errorResponse, paginatedResponse } from '../utils/apiResponse.js';
 
 /**
@@ -83,6 +84,16 @@ export const processPayment = async (req, res, next) => {
     premium.transactionID = transactionID || `TXN-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
     await premium.save();
+
+    // Send Notification
+    const populatedPremium = await premium.populate('policyID', 'policyName');
+    await Notification.create({
+      customerID: premium.customerID,
+      messageType: 'Payment',
+      title: 'Payment Successful',
+      message: `Payment of ₹${premium.totalPremiumAmount} for policy "${populatedPremium.policyID.policyName}" has been received. Transaction ID: ${premium.transactionID}`,
+      policyID: premium.policyID
+    });
 
     // Update associated Renewal status if any
     await PolicyRenewal.findOneAndUpdate(

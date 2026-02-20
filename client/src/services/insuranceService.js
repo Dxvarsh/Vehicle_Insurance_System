@@ -24,9 +24,8 @@ const insuranceService = {
   getAllClaims: (params) => api.get('/claims', { params }),
   getMyClaims: (params) => api.get('/claims/my', { params }),
   getClaimById: (id) => api.get(`/claims/${id}`),
-  approveClaim: (id, data) => api.put(`/claims/${id}/approve`, data),
-  rejectClaim: (id, data) => api.put(`/claims/${id}/reject`, data),
-  reviewClaim: (id, data) => api.put(`/claims/${id}/review`, data),
+  processClaim: (id, data) => api.put(`/claims/${id}/process`, data),
+  getClaimStats: () => api.get('/claims/stats'),
 };
 
 export default insuranceService;

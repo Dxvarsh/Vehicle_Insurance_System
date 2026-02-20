@@ -4,6 +4,7 @@ import customerReducer from './slices/customerSlice';
 import vehicleReducer from './slices/vehicleSlice';
 import policyReducer from './slices/policySlice';
 import insuranceReducer from './slices/insuranceSlice';
+import notificationReducer from './slices/notificationSlice';
 
 const store = configureStore({
     reducer: {
@@ -12,13 +13,7 @@ const store = configureStore({
         vehicle: vehicleReducer,
         policy: policyReducer,
         insurance: insuranceReducer,
-        // Future slices:
-        // policy: policyReducer,
-        // premium: premiumReducer,
-        // renewal: renewalReducer,
-        // claim: claimReducer,
-        // notification: notificationReducer,
-        // dashboard: dashboardReducer,
+        notification: notificationReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

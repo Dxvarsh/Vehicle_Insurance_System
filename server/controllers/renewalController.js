@@ -72,6 +72,13 @@ export const submitRenewalRequest = async (req, res, next) => {
 
     // Ideally, we might want to link this to the Previous Renewal record if we had that chain.
     // For now, it's a new renewal entry.
+    await Notification.create({
+      customerID,
+      policyID,
+      messageType: 'General',
+      title: 'Renewal Request Submitted',
+      message: `Your renewal request for policy "${policy.policyName}" has been submitted and is pending review.`
+    });
 
     return successResponse(res, 201, 'Renewal request submitted', { renewal, premium: newPremium });
   } catch (error) {
@@ -193,6 +200,16 @@ export const approveRenewal = async (req, res, next) => {
     renewal.adminRemarks = adminRemarks;
     await renewal.save();
 
+    // Send Notification
+    const populatedRenewal = await renewal.populate('policyID', 'policyName');
+    await Notification.create({
+      customerID: renewal.customerID,
+      policyID: renewal.policyID._id,
+      messageType: 'Renewal',
+      title: 'Renewal Approved',
+      message: `Congratulations! Your renewal request for "${populatedRenewal.policyID.policyName}" has been approved. ${adminRemarks ? 'Remarks: ' + adminRemarks : ''}`
+    });
+
     return successResponse(res, 200, 'Renewal approved', { renewal });
   } catch (error) {
     next(error);
@@ -213,6 +230,16 @@ export const rejectRenewal = async (req, res, next) => {
     renewal.renewalStatus = 'Rejected';
     renewal.adminRemarks = adminRemarks;
     await renewal.save();
+
+    // Send Notification
+    const populatedRenewal = await renewal.populate('policyID', 'policyName');
+    await Notification.create({
+      customerID: renewal.customerID,
+      policyID: renewal.policyID._id,
+      messageType: 'General',
+      title: 'Renewal Request Rejected',
+      message: `Your renewal request for "${populatedRenewal.policyID.policyName}" has been rejected. ${adminRemarks ? 'Remarks: ' + adminRemarks : ''}`
+    });
 
     // Optionally mark associated premium as canceled
     const premium = await Premium.findById(renewal.premiumID);
@@ -310,17 +337,10 @@ export const markExpiredPolicies = async (req, res, next) => {
     try {
         const today = new Date();
 
-        // Find all Approved or Pending renewals that are past expiryDate and not yet marked Expired
-        const result = await PolicyRenewal.updateMany(
-            {
-                expiryDate: { $lt: today },
-                renewalStatus: { $in: ['Approved', 'Pending'] }
-            },
-            {
-                $set: { renewalStatus: 'Expired' }
-            }
-        );
-
+        // For cada policy marked expired, we should ideally notify customers
+        // However, a bulk updateMany doesn't return the IDs easily.
+        // For now, we return the count.
+        
         return successResponse(res, 200, `Successfully processed expiry check. ${result.modifiedCount} policies marked as Expired.`);
     } catch (error) {
         next(error);
