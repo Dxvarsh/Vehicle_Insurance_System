@@ -22,7 +22,7 @@ export const getAdminStats = async (req, res, next) => {
             PolicyRenewal.countDocuments({ renewalStatus: 'Approved' }),
             Premium.aggregate([
                 { $match: { paymentStatus: 'Paid' } },
-                { $group: { _id: null, total: { $sum: '$totalPremiumAmount' } } }
+                { $group: { _id: null, total: { $sum: '$calculatedAmount' } } }
             ]),
             Claim.aggregate([
                 { $match: { claimStatus: 'Approved' } },
@@ -88,7 +88,7 @@ export const getChartData = async (req, res, next) => {
                         month: { $month: '$paymentDate' },
                         year: { $year: '$paymentDate' }
                     },
-                    total: { $sum: '$totalPremiumAmount' }
+                    total: { $sum: '$calculatedAmount' }
                 }
             },
             { $sort: { '_id.year': 1, '_id.month': 1 } }

@@ -26,7 +26,7 @@ const Navbar = ({ onMenuToggle }) => {
     const profileRef = useRef(null);
 
     useEffect(() => {
-        if (user) {
+        if (user && user.role === 'Customer') {
             dispatch(fetchUnreadCount());
         }
     }, [dispatch, user]);

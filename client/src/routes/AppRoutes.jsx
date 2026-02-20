@@ -31,6 +31,7 @@ import CustomerListPage from '../pages/admin/CustomerListPage';
 import CustomerDetailPage from '../pages/admin/CustomerDetailPage';
 import RegisterCustomerPage from '../pages/admin/RegisterCustomerPage';
 import AdminVehicleListPage from '../pages/admin/AdminVehicleListPage';
+import AdminReportsPage from '../pages/admin/AdminReportsPage';
 
 // Staff Pages
 import StaffDashboardPage from '../pages/staff/StaffDashboardPage';
@@ -247,6 +248,11 @@ const AppRoutes = () => {
       <Route path="/admin/vehicles/:id/edit" element={
         <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
           <DashboardLayout><EditVehiclePage /></DashboardLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/reports" element={
+        <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
+          <DashboardLayout><AdminReportsPage /></DashboardLayout>
         </ProtectedRoute>
       } />
 

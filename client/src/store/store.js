@@ -5,6 +5,7 @@ import vehicleReducer from './slices/vehicleSlice';
 import policyReducer from './slices/policySlice';
 import insuranceReducer from './slices/insuranceSlice';
 import notificationReducer from './slices/notificationSlice';
+import dashboardReducer from './slices/dashboardSlice';
 
 const store = configureStore({
     reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
         policy: policyReducer,
         insurance: insuranceReducer,
         notification: notificationReducer,
+        dashboard: dashboardReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
