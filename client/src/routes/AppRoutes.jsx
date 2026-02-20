@@ -46,6 +46,11 @@ import MyPremiumsPage from '../pages/premium/MyPremiumsPage';
 import AdminPremiumListPage from '../pages/admin/AdminPremiumListPage';
 import PremiumReceiptPage from '../pages/premium/PremiumReceiptPage';
 
+// Renewal Pages
+import RenewalListPage from '../pages/renewal/RenewalListPage';
+import RenewalRequestPage from '../pages/renewal/RenewalRequestPage';
+import AdminRenewalListPage from '../pages/admin/AdminRenewalListPage';
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -125,6 +130,18 @@ const AppRoutes = () => {
         </ProtectedRoute>
       } />
 
+      {/* Renewal Routes */}
+      <Route path="/renewals" element={
+        <ProtectedRoute allowedRoles={[ROLES.CUSTOMER]}>
+          <DashboardLayout><RenewalListPage /></DashboardLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/renewals/request" element={
+        <ProtectedRoute allowedRoles={[ROLES.CUSTOMER]}>
+          <DashboardLayout><RenewalRequestPage /></DashboardLayout>
+        </ProtectedRoute>
+      } />
+
 
       {/* ═══════════════════════════════════════════ */}
       {/*             ADMIN ROUTES                    */}
@@ -184,6 +201,11 @@ const AppRoutes = () => {
       <Route path="/admin/premiums" element={
         <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
           <DashboardLayout><AdminPremiumListPage /></DashboardLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/renewals" element={
+        <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
+          <DashboardLayout><AdminRenewalListPage /></DashboardLayout>
         </ProtectedRoute>
       } />
       <Route path="/admin/vehicles/:id/edit" element={

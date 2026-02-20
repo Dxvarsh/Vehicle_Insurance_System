@@ -2,6 +2,7 @@ import PolicyRenewal from '../models/PolicyRenewal.js';
 import Premium from '../models/Premium.js';
 import InsurancePolicy from '../models/InsurancePolicy.js';
 import Vehicle from '../models/Vehicle.js';
+import Notification from '../models/Notification.js';
 import { successResponse, errorResponse, paginatedResponse } from '../utils/apiResponse.js';
 import { calculatePremium } from '../utils/premiumCalculator.js';
 
@@ -254,6 +255,73 @@ export const getExpiringRenewals = async (req, res, next) => {
         .lean();
 
         return successResponse(res, 200, `Found ${renewals.length} expiring policies`, { renewals });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * @desc    Send renewal reminder (Admin/Staff)
+ * @route   POST /api/renewals/:id/remind
+ * @access  Admin, Staff
+ */
+export const sendRenewalReminder = async (req, res, next) => {
+    try {
+        const renewal = await PolicyRenewal.findById(req.params.id)
+            .populate('customerID', 'name email')
+            .populate('policyID', 'policyName');
+
+        if (!renewal) return errorResponse(res, 404, 'Renewal record not found');
+
+        // Check if already reminded recently (e.g., today)
+        const today = new Date();
+        if (renewal.reminderSentStatus && 
+            renewal.reminderSentDate && 
+            renewal.reminderSentDate.toDateString() === today.toDateString()) {
+            return errorResponse(res, 400, 'Reminder already sent today');
+        }
+
+        // Create notification
+        await Notification.create({
+            customerID: renewal.customerID._id,
+            policyID: renewal.policyID._id,
+            messageType: 'Renewal',
+            title: 'Policy Renewal Reminder',
+            message: `Your policy "${renewal.policyID.policyName}" is expiring on ${renewal.expiryDate.toLocaleDateString()}. Please initiate a renewal request to avoid coverage gaps.`
+        });
+
+        // Update renewal record
+        renewal.reminderSentStatus = true;
+        renewal.reminderSentDate = today;
+        await renewal.save();
+
+        return successResponse(res, 200, 'Renewal reminder sent successfully');
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * @desc    Auto mark expired policies (Admin/Scheduled Task)
+ * @route   PUT /api/renewals/mark-expired
+ * @access  Admin
+ */
+export const markExpiredPolicies = async (req, res, next) => {
+    try {
+        const today = new Date();
+
+        // Find all Approved or Pending renewals that are past expiryDate and not yet marked Expired
+        const result = await PolicyRenewal.updateMany(
+            {
+                expiryDate: { $lt: today },
+                renewalStatus: { $in: ['Approved', 'Pending'] }
+            },
+            {
+                $set: { renewalStatus: 'Expired' }
+            }
+        );
+
+        return successResponse(res, 200, `Successfully processed expiry check. ${result.modifiedCount} policies marked as Expired.`);
     } catch (error) {
         next(error);
     }

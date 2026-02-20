@@ -3,6 +3,7 @@ import authReducer from './slices/authSlice';
 import customerReducer from './slices/customerSlice';
 import vehicleReducer from './slices/vehicleSlice';
 import policyReducer from './slices/policySlice';
+import insuranceReducer from './slices/insuranceSlice';
 
 const store = configureStore({
     reducer: {
@@ -10,6 +11,7 @@ const store = configureStore({
         customer: customerReducer,
         vehicle: vehicleReducer,
         policy: policyReducer,
+        insurance: insuranceReducer,
         // Future slices:
         // policy: policyReducer,
         // premium: premiumReducer,

@@ -85,3 +85,23 @@ curl --location 'http://localhost:5000/api/renewals/<RENEWAL_ID>/reject' \
     "adminRemarks": "Rejected. Vehicle age exceeds limit."
 }'
 ```
+
+## 8. Send Renewal Reminder (Admin/Staff)
+
+**Endpoint:** `POST /api/renewals/:id/remind`
+**Description:** Send a manual notification reminder to the customer about their expiring policy.
+
+```bash
+curl --location 'http://localhost:5000/api/renewals/<RENEWAL_ID>/remind' \
+--header 'Authorization: Bearer <TOKEN>'
+```
+
+## 9. Batch Mark Expired Policies (Admin)
+
+**Endpoint:** `PUT /api/renewals/mark-expired`
+**Description:** Manually trigger a system check to mark all policies past their expiry date as 'Expired'.
+
+```bash
+curl --location --request PUT 'http://localhost:5000/api/renewals/mark-expired' \
+--header 'Authorization: Bearer <ADMIN_TOKEN>'
+```
