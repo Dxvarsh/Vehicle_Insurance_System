@@ -21,6 +21,7 @@ import premiumRoutes from './routes/premiumRoutes.js';
 import renewalRoutes from './routes/renewalRoutes.js';
 import claimRoutes from './routes/claimRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import dashboardRoutes from './routes/dashboardRoutes.js';
 
 const app = express();
 
@@ -83,6 +84,7 @@ app.use('/api/premiums', premiumRoutes);
 app.use('/api/renewals', renewalRoutes);
 app.use('/api/claims', claimRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Health Check
 app.get('/api/health', (req, res) => {
