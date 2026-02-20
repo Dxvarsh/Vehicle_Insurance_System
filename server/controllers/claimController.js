@@ -1,47 +1,33 @@
 import Claim from '../models/Claim.js';
 import Premium from '../models/Premium.js';
-import InsurancePolicy from '../models/InsurancePolicy.js';
-import Vehicle from '../models/Vehicle.js';
+import Notification from '../models/Notification.js';
 import { successResponse, errorResponse, paginatedResponse } from '../utils/apiResponse.js';
 
 /**
  * @desc    Submit a new insurance claim
  * @route   POST /api/claims
  * @access  Customer
- * 
- * Requirement: CLM-01, CLM-02, CLM-03, CLM-226 (Active only)
  */
 export const submitClaim = async (req, res, next) => {
   try {
     const { policyID, vehicleID, premiumID, claimReason, supportingDocuments } = req.body;
 
-    // Verify customer
     if (!req.user.linkedCustomerID) {
-      return errorResponse(res, 400, 'No customer profile linked to your account');
+      return errorResponse(res, 400, 'No linked customer profile');
     }
     const customerID = req.user.linkedCustomerID;
 
-    // Verify active policy (Must be Paid and not expired)
+    // Verify policy eligibility (must be active/paid)
     const premium = await Premium.findOne({
       _id: premiumID,
+      customerID,
       policyID,
       vehicleID,
-      customerID,
       paymentStatus: 'Paid'
     });
 
     if (!premium) {
-      return errorResponse(res, 400, 'You can only raise a claim for an active and paid policy');
-    }
-
-    // Check if there's already a pending claim for this policy
-    const existingClaim = await Claim.findOne({
-      premiumID,
-      claimStatus: { $in: ['Pending', 'Under-Review'] }
-    });
-
-    if (existingClaim) {
-      return errorResponse(res, 409, 'You already have a claim under process for this policy');
+      return errorResponse(res, 400, 'Claim can only be raised on active, paid policies');
     }
 
     const claim = await Claim.create({
@@ -51,8 +37,7 @@ export const submitClaim = async (req, res, next) => {
       premiumID,
       claimReason,
       supportingDocuments: supportingDocuments || [],
-      claimDate: new Date(),
-      claimStatus: 'Pending'
+      claimDate: new Date()
     });
 
     return successResponse(res, 201, 'Claim submitted successfully', { claim });
@@ -62,41 +47,26 @@ export const submitClaim = async (req, res, next) => {
 };
 
 /**
- * @desc    Get all claims with filters
+ * @desc    Get all claims (Admin/Staff)
  * @route   GET /api/claims
  * @access  Admin, Staff
  */
 export const getAllClaims = async (req, res, next) => {
   try {
-    const {
-      page = 1,
-      limit = 10,
-      claimStatus,
-      customerID,
-      vehicleID,
-      sortBy = 'createdAt',
-      sortOrder = 'desc'
-    } = req.query;
-
+    const { page = 1, limit = 10, claimStatus, search } = req.query;
     const pageNum = parseInt(page, 10);
     const limitNum = parseInt(limit, 10);
-    const skip = (pageNum - 1) * limitNum;
 
     const filter = {};
     if (claimStatus) filter.claimStatus = claimStatus;
-    if (customerID) filter.customerID = customerID;
-    if (vehicleID) filter.vehicleID = vehicleID;
-
-    const sort = {};
-    sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
 
     const [claims, total] = await Promise.all([
       Claim.find(filter)
-        .populate('customerID', 'name email contactNumber customerID')
-        .populate('policyID', 'policyName policyID coverageType')
-        .populate('vehicleID', 'vehicleNumber vehicleType model')
-        .sort(sort)
-        .skip(skip)
+        .populate('customerID', 'name email customerID')
+        .populate('policyID', 'policyName policyID')
+        .populate('vehicleID', 'vehicleNumber model')
+        .sort({ createdAt: -1 })
+        .skip((pageNum - 1) * limitNum)
         .limit(limitNum)
         .lean(),
       Claim.countDocuments(filter)
@@ -109,27 +79,26 @@ export const getAllClaims = async (req, res, next) => {
 };
 
 /**
- * @desc    Get logged-in customer's claims
+ * @desc    Get my claims (Customer)
  * @route   GET /api/claims/my
  * @access  Customer
  */
 export const getMyClaims = async (req, res, next) => {
   try {
     if (!req.user.linkedCustomerID) {
-      return errorResponse(res, 400, 'No customer profile linked');
+      return errorResponse(res, 400, 'No linked customer profile');
     }
 
     const { page = 1, limit = 10 } = req.query;
     const pageNum = parseInt(page, 10);
     const limitNum = parseInt(limit, 10);
-    const skip = (pageNum - 1) * limitNum;
 
     const [claims, total] = await Promise.all([
       Claim.find({ customerID: req.user.linkedCustomerID })
         .populate('policyID', 'policyName policyID coverageType')
-        .populate('vehicleID', 'vehicleNumber vehicleType model')
+        .populate('vehicleID', 'vehicleNumber model')
         .sort({ createdAt: -1 })
-        .skip(skip)
+        .skip((pageNum - 1) * limitNum)
         .limit(limitNum)
         .lean(),
       Claim.countDocuments({ customerID: req.user.linkedCustomerID })
@@ -144,105 +113,115 @@ export const getMyClaims = async (req, res, next) => {
 /**
  * @desc    Get claim by ID
  * @route   GET /api/claims/:id
- * @access  Admin, Staff, Owner
+ * @access  Protected
  */
 export const getClaimById = async (req, res, next) => {
   try {
     const claim = await Claim.findById(req.params.id)
       .populate('customerID', 'name email contactNumber customerID')
-      .populate('policyID', 'policyName policyID coverageType baseAmount')
-      .populate('vehicleID', 'vehicleNumber vehicleType model registrationYear')
-      .populate('premiumID', 'premiumID calculatedAmount paymentDate')
-      .lean();
+      .populate('policyID', 'policyName policyID coverageType description')
+      .populate('vehicleID', 'vehicleNumber model vehicleType registrationYear')
+      .populate('premiumID', 'calculatedAmount paymentStatus calculationBreakdown');
 
     if (!claim) {
-      return errorResponse(res, 404, 'Claim not found');
+      return errorResponse(res, 404, 'Claim record not found');
     }
 
-    // Ownership check for Customer
+    // Access Control
     if (req.user.role === 'Customer') {
-      if (claim.customerID._id.toString() !== req.user.linkedCustomerID.toString()) {
+      if (claim.customerID._id.toString() !== req.user.linkedCustomerID?.toString()) {
         return errorResponse(res, 403, 'Unauthorized access to this claim');
       }
     }
 
-    return successResponse(res, 200, 'Claim fetched successfully', { claim });
+    return successResponse(res, 200, 'Claim details fetched', { claim });
   } catch (error) {
     next(error);
   }
 };
 
 /**
- * @desc    Approve claim
- * @route   PUT /api/claims/:id/approve
+ * @desc    Process a claim (Approve/Reject/Review)
+ * @route   PUT /api/claims/:id/process
  * @access  Admin
  */
-export const approveClaim = async (req, res, next) => {
+export const processClaim = async (req, res, next) => {
   try {
-    const { claimAmount, adminRemarks } = req.body;
+    const { claimStatus, claimAmount, adminRemarks } = req.body;
+    
+    const claim = await Claim.findById(req.params.id)
+      .populate('policyID', 'policyName');
 
-    const claim = await Claim.findById(req.params.id);
-    if (!claim) return errorResponse(res, 404, 'Claim not found');
+    if (!claim) return errorResponse(res, 404, 'Claim record not found');
 
-    if (claim.claimStatus === 'Approved') {
-      return errorResponse(res, 400, 'Claim is already approved');
+    if (claimStatus === 'Approved') {
+      claim.claimAmount = claimAmount;
     }
-
-    claim.claimStatus = 'Approved';
-    claim.claimAmount = claimAmount;
+    
+    claim.claimStatus = claimStatus;
     claim.adminRemarks = adminRemarks;
     claim.processedDate = new Date();
-
+    
     await claim.save();
 
-    return successResponse(res, 200, 'Claim approved successfully', { claim });
+    // Notify Customer
+    await Notification.create({
+      customerID: claim.customerID,
+      messageType: 'Claim-Update',
+      title: 'Claim Status Updated',
+      message: `Your claim (${claim.claimID}) for policy "${claim.policyID.policyName}" has been updated to "${claimStatus}". ${adminRemarks ? 'Remarks: ' + adminRemarks : ''}`
+    });
+
+    return successResponse(res, 200, `Claim ${claimStatus.toLowerCase()} successfully`, { claim });
   } catch (error) {
     next(error);
   }
 };
 
 /**
- * @desc    Reject claim
- * @route   PUT /api/claims/:id/reject
- * @access  Admin
+ * @desc    Get claim statistics (Admin)
+ * @route   GET /api/claims/stats
+ * @access  Admin, Staff
  */
-export const rejectClaim = async (req, res, next) => {
+export const getClaimStats = async (req, res, next) => {
   try {
-    const { adminRemarks } = req.body;
+    const stats = await Claim.aggregate([
+      {
+        $group: {
+          _id: '$claimStatus',
+          count: { $sum: 1 },
+          totalAmount: { $sum: '$claimAmount' }
+        }
+      }
+    ]);
 
-    const claim = await Claim.findById(req.params.id);
-    if (!claim) return errorResponse(res, 404, 'Claim not found');
+    const formattedStats = {
+      total: 0,
+      approved: { count: 0, amount: 0 },
+      pending: { count: 0 },
+      rejected: { count: 0 },
+      underReview: { count: 0 }
+    };
 
-    claim.claimStatus = 'Rejected';
-    claim.adminRemarks = adminRemarks;
-    claim.processedDate = new Date();
+    stats.forEach(stat => {
+      formattedStats.total += stat.count;
+      switch (stat._id) {
+        case 'Approved':
+          formattedStats.approved = { count: stat.count, amount: stat.totalAmount };
+          break;
+        case 'Pending':
+          formattedStats.pending = { count: stat.count };
+          break;
+        case 'Rejected':
+          formattedStats.rejected = { count: stat.count };
+          break;
+        case 'Under-Review':
+          formattedStats.underReview = { count: stat.count };
+          break;
+      }
+    });
 
-    await claim.save();
-
-    return successResponse(res, 200, 'Claim rejected successfully', { claim });
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * @desc    Mark claim as under review
- * @route   PUT /api/claims/:id/review
- * @access  Admin
- */
-export const reviewClaim = async (req, res, next) => {
-  try {
-    const { adminRemarks } = req.body;
-
-    const claim = await Claim.findById(req.params.id);
-    if (!claim) return errorResponse(res, 404, 'Claim not found');
-
-    claim.claimStatus = 'Under-Review';
-    if (adminRemarks) claim.adminRemarks = adminRemarks;
-
-    await claim.save();
-
-    return successResponse(res, 200, 'Claim marked as under review', { claim });
+    return successResponse(res, 200, 'Claim statistics fetched', { stats: formattedStats });
   } catch (error) {
     next(error);
   }

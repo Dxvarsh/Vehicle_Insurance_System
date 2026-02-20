@@ -4,22 +4,29 @@ import {
   getAllClaims,
   getMyClaims,
   getClaimById,
-  approveClaim,
-  rejectClaim,
-  reviewClaim
+  processClaim,
+  getClaimStats
 } from '../controllers/claimController.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
+import { submitClaimValidator, processClaimValidator } from '../validators/claimValidator.js';
+import validate from '../middleware/validate.js';
 
 const router = express.Router();
 
 router.use(protect);
 
-router.post('/', authorize('Customer'), submitClaim);
-router.get('/', authorize('Admin', 'Staff'), getAllClaims);
+// ── Customer Routes ──
+router.post('/', authorize('Customer'), submitClaimValidator, validate, submitClaim);
 router.get('/my', authorize('Customer'), getMyClaims);
-router.get('/:id', authorize('Admin', 'Staff', 'Customer'), getClaimById);
-router.put('/:id/approve', authorize('Admin'), approveClaim);
-router.put('/:id/reject', authorize('Admin'), rejectClaim);
-router.put('/:id/review', authorize('Admin'), reviewClaim);
+
+// ── Admin/Staff Routes ──
+router.get('/', authorize('Admin', 'Staff'), getAllClaims);
+router.get('/stats', authorize('Admin', 'Staff'), getClaimStats);
+
+// ── Protected Detail Route ──
+router.get('/:id', getClaimById);
+
+// ── Admin Action Routes ──
+router.put('/:id/process', authorize('Admin'), processClaimValidator, validate, processClaim);
 
 export default router;
